@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { Autor, Genero } from '../../models/library';
-import { idAsString } from '../../services/api-utils';
+import { Author } from '../../features/authors/models/author';
+import { Genre } from '../../features/genres/models/genre';
 import { GlassButton } from '../glass-button/glass-button';
 
 @Component({
@@ -29,14 +29,14 @@ import { GlassButton } from '../glass-button/glass-button';
             <input type="checkbox" [checked]="selected().length === 0 && selectedCategories().length === 0" [attr.aria-checked]="selected().length === 0 && selectedCategories().length === 0" (change)="clearAll.emit()" />
             <span>Todos</span>
           </label>
-          @for (author of authors(); track authorId(author)) {
+          @for (author of authors(); track author._id) {
             <div class="author-option">
               <label>
                 <input
                   type="checkbox"
-                  [checked]="selected().includes(authorId(author))"
-                  [attr.aria-checked]="selected().includes(authorId(author))"
-                  (change)="toggleAuthor(authorId(author))"
+                  [checked]="selected().includes(author._id)"
+                  [attr.aria-checked]="selected().includes(author._id)"
+                  (change)="toggleAuthor(author._id)"
                 />
                 <span>{{ author.name }}</span>
               </label>
@@ -51,10 +51,10 @@ import { GlassButton } from '../glass-button/glass-button';
             <input type="checkbox" [checked]="selectedCategories().length === 0" [attr.aria-checked]="selectedCategories().length === 0" (change)="clearCategories.emit()" />
             <span>Todas</span>
           </label>
-          @for (category of categories(); track categoryId(category)) {
+          @for (category of categories(); track category._id) {
             <div class="author-option">
               <label>
-                <input type="checkbox" [checked]="selectedCategories().includes(categoryId(category))" [attr.aria-checked]="selectedCategories().includes(categoryId(category))" (change)="categorySelected.emit(categoryId(category))" />
+                <input type="checkbox" [checked]="selectedCategories().includes(category._id)" [attr.aria-checked]="selectedCategories().includes(category._id)" (change)="categorySelected.emit(category._id)" />
                 <span>{{ category.name }}</span>
               </label>
               <app-glass-button label="Eliminar categoría" width="32px" height="28px" (clicked)="deleteCategoryRequested.emit(category)" />
@@ -85,8 +85,8 @@ import { GlassButton } from '../glass-button/glass-button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthorFilter {
-  readonly authors = input.required<Autor[]>();
-  readonly categories = input.required<Genero[]>();
+  readonly authors = input.required<Author[]>();
+  readonly categories = input.required<Genre[]>();
   readonly selected = input.required<string[]>();
   readonly selectedCategories = input.required<string[]>();
   readonly open = input(false);
@@ -98,16 +98,8 @@ export class AuthorFilter {
   readonly authorSelected = output<string>();
   readonly categorySelected = output<string>();
   readonly close = output<void>();
-  readonly deleteAuthorRequested = output<Autor>();
-  readonly deleteCategoryRequested = output<Genero>();
-
-  authorId(author: Autor): string {
-    return idAsString(author._id);
-  }
-
-  categoryId(category: Genero): string {
-    return idAsString(category._id);
-  }
+  readonly deleteAuthorRequested = output<Author>();
+  readonly deleteCategoryRequested = output<Genre>();
 
   toggleAuthor(authorId: string): void {
     this.authorSelected.emit(authorId);

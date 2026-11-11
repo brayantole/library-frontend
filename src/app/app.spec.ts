@@ -1,9 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { App } from './app';
-import { AuthorService } from './services/author';
-import { BookService } from './services/book';
-import { GenreService } from './services/genre';
+import { AuthorService } from './features/authors/services/author.service';
+import { BookService } from './features/books/services/book.service';
+import { GenreService } from './features/genres/services/genre.service';
 import { API_BASE_URL } from './core/config/api.config';
 
 describe('App', () => {
@@ -11,9 +11,9 @@ describe('App', () => {
     await TestBed.configureTestingModule({
       imports: [App],
       providers: [
-        { provide: AuthorService, useValue: { getAuthors: () => of([]) } },
-        { provide: BookService, useValue: { getBooks: () => of([]), createBook: () => of({}) } },
-        { provide: GenreService, useValue: { getGenres: () => of([]) } },
+        { provide: AuthorService, useValue: { getAll: () => of([]), create: () => of({}) } },
+        { provide: BookService, useValue: { getAll: () => of([]), create: () => of({}) } },
+        { provide: GenreService, useValue: { getAll: () => of([]), create: () => of({}) } },
         { provide: API_BASE_URL, useValue: 'http://localhost:3000/api/v1' },
       ],
     })
@@ -37,8 +37,8 @@ describe('App', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
 
-    app.authors.set([{ _id: 'author-1', name: 'Autor Uno', nationality: 'ES' }]);
-    app.genres.set([{ _id: 'genre-1', name: 'Ficción' }]);
+    app.authors.set([{ _id: 'author-1', name: 'Autor Uno', nationality: 'ES', createdAt: '', updatedAt: '' }]);
+    app.genres.set([{ _id: 'genre-1', name: 'Ficción', createdAt: '', updatedAt: '' }]);
     app.books.set([
       {
         _id: 'book-1',
@@ -47,8 +47,10 @@ describe('App', () => {
         available: true,
         authorId: 'author-1',
         genreIds: ['genre-1'],
-        author: { name: 'Autor Uno', nationality: 'ES' },
-        genres: [{ _id: 'genre-1', name: 'Ficción' }],
+        createdAt: '',
+        updatedAt: '',
+        author: { _id: 'author-1', name: 'Autor Uno', nationality: 'ES', createdAt: '', updatedAt: '' },
+        genres: [{ _id: 'genre-1', name: 'Ficción', createdAt: '', updatedAt: '' }],
       },
       {
         _id: 'book-2',
@@ -57,8 +59,10 @@ describe('App', () => {
         available: true,
         authorId: 'author-2',
         genreIds: ['genre-2'],
-        author: { name: 'Otro Autor', nationality: 'ES' },
-        genres: [{ name: 'Historia' }],
+        createdAt: '',
+        updatedAt: '',
+        author: { _id: 'author-2', name: 'Otro Autor', nationality: 'ES', createdAt: '', updatedAt: '' },
+        genres: [{ _id: 'genre-2', name: 'Historia', createdAt: '', updatedAt: '' }],
       },
     ]);
 

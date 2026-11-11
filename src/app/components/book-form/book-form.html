@@ -7,17 +7,19 @@
   <input id="isbn" type="text" formControlName="isbn" />
   @if (isInvalid('isbn')) { <small>El ISBN es obligatorio y debe tener al menos 10 caracteres.</small> }
 
-  <app-author-select
-    [authors]="authors()"
-    [value]="form.controls.authorId.value"
-    (selected)="updateAuthor($event)"
-  />
+  <label for="authorId">Autor</label>
+  <select id="authorId" formControlName="authorId">
+    <option value="">Selecciona un autor</option>
+    @for (author of authors(); track author._id) {
+      <option [value]="author._id">{{ author.name }}</option>
+    }
+  </select>
   @if (isInvalid('authorId')) { <small>Debes seleccionar un autor existente.</small> }
 
   <label for="genreIds">Géneros</label>
-  <select id="genreIds" multiple (change)="updateGenres($event)">
+  <select id="genreIds" multiple formControlName="genreIds">
     @for (genre of genres(); track genre._id) {
-      <option [value]="genreId(genre)">{{ genre.name }}</option>
+      <option [value]="genre._id">{{ genre.name }}</option>
     }
   </select>
   @if (isInvalid('genreIds')) { <small>Selecciona al menos un género.</small> }

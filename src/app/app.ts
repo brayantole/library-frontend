@@ -1,17 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, HostListener, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, HostListener, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs';
-import { HttpErrorResponse } from '@angular/common/http';
 import { BookForm } from './components/book-form/book-form';
 import { BookList } from './components/book-list/book-list';
-import { AuthorService } from './services/author';
-import { BookService } from './services/book';
-import { GenreService } from './services/genre';
-import { Autor, CrearLibro, Genero, Libro } from './models/library';
-import { apiErrorMessage, idAsString } from './services/api-utils';
+import { Author } from './features/authors/models/author';
+import { CreateBookDto, Book } from './features/books/models/book';
+import { Genre } from './features/genres/models/genre';
+import { ApiError } from './core/models/api-error';
+import { BooksStore } from './features/books/store/books.store';
+import { AuthorsStore } from './features/authors/store/authors.store';
+import { GenresStore } from './features/genres/store/genres.store';
 import { EntityForm, EntityFormValue } from './components/entity-form/entity-form';
 import { AuthorFilter } from './components/author-filter/author-filter';
 import { GlassButton } from './components/glass-button/glass-button';
+import { ToastService } from './core/ui/toast.service';
+import { Toast } from './shared/ui/toast';
+import { Modal } from './shared/ui/modal';
+import { ConfirmDialog } from './shared/ui/confirm-dialog';
 
 type DeletionTarget =
   | { kind: 'book'; id: string; name: string }
@@ -21,61 +26,42 @@ type DeletionTarget =
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [BookForm, BookList, EntityForm, AuthorFilter, GlassButton],
+  imports: [BookForm, BookList, EntityForm, AuthorFilter, GlassButton, Toast, Modal, ConfirmDialog],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
-  private readonly bookService = inject(BookService);
-  private readonly authorService = inject(AuthorService);
-  private readonly genreService = inject(GenreService);
+  readonly booksStore = inject(BooksStore);
+  readonly authorsStore = inject(AuthorsStore);
+  readonly genresStore = inject(GenresStore);
+  readonly toastService = inject(ToastService);
   private readonly destroyRef = inject(DestroyRef);
 
-  readonly books = signal<Libro[]>([]);
-  readonly authors = signal<Autor[]>([]);
-  readonly genres = signal<Genero[]>([]);
-  readonly autoresSeleccionados = signal<string[]>([]);
+  readonly books = this.booksStore.items;
+  readonly authors = this.authorsStore.items;
+  readonly genres = this.genresStore.items;
+  readonly autoresSeleccionados = this.booksStore.selectedAuthorIds;
   readonly pendingAuthorIds = signal<string[]>([]);
-  readonly categoriasSeleccionadas = signal<string[]>([]);
+  readonly categoriasSeleccionadas = this.booksStore.selectedGenreIds;
   readonly pendingCategoryIds = signal<string[]>([]);
   readonly authorFilterOpen = signal(false);
-  readonly booksLoaded = signal(false);
-  readonly booksLoading = signal(false);
+  readonly booksLoaded = this.booksStore.loaded;
+  readonly booksLoading = this.booksStore.loading;
   readonly saving = signal(false);
   readonly formError = signal('');
-  readonly catalogError = signal('');
+  readonly catalogError = this.booksStore.error;
   readonly searchTerm = signal('');
   readonly activePanel = signal<'book' | 'author' | 'genre' | null>(null);
   readonly authorFormError = signal('');
   readonly genreFormError = signal('');
-  readonly toast = signal('');
   readonly pendingDeletion = signal<DeletionTarget | null>(null);
   readonly borrando = signal<string | null>(null);
-  readonly filteredBooks = computed(() => {
-    const authorIds = this.autoresSeleccionados();
-    const categoryIds = this.categoriasSeleccionadas();
-    const search = this.searchTerm().trim().toLocaleLowerCase();
-    return this.books().filter((book) => {
-      const authorMatches = authorIds.length === 0
-        || authorIds.includes(idAsString(book.authorId));
-      const categoryMatches = categoryIds.length === 0
-        || (book.genreIds ?? []).some((id) => categoryIds.includes(idAsString(id)));
-      const searchMatches = !search || book.title.toLocaleLowerCase().includes(search)
-        || book.author?.name.toLocaleLowerCase().includes(search);
-      return authorMatches && categoryMatches && searchMatches;
-    });
-  });
+  readonly filteredBooks = this.booksStore.filteredBooks;
 
   constructor() {
-    this.authorService.getAuthors().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (authors) => this.authors.set(authors),
-      error: () => this.formError.set('No se pudo cargar la lista de autores.'),
-    });
-    this.genreService.getGenres().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (genres) => this.genres.set(genres),
-      error: () => this.formError.set('No se pudo cargar la lista de géneros.'),
-    });
+    this.authorsStore.load();
+    this.genresStore.load();
     this.loadBooks();
   }
 
@@ -87,19 +73,7 @@ export class App {
   }
 
   loadBooks(): void {
-    this.booksLoading.set(true);
-    this.catalogError.set('');
-    this.bookService.getBooks().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: (books) => {
-        this.books.set(books);
-        this.booksLoaded.set(true);
-        this.booksLoading.set(false);
-      },
-      error: () => {
-        this.catalogError.set('No se pudo cargar el catálogo. Inténtalo de nuevo.');
-        this.booksLoading.set(false);
-      },
-    });
+    this.booksStore.load();
   }
 
   toggleAuthorFilter(): void {
@@ -141,35 +115,29 @@ export class App {
     this.clearAllPendingFilters();
     this.autoresSeleccionados.set([]);
     this.categoriasSeleccionadas.set([]);
+    this.booksStore.selectedAuthorIds.set([]);
+    this.booksStore.selectedGenreIds.set([]);
   }
 
   applyAuthorFilter(): void {
     this.autoresSeleccionados.set([...this.pendingAuthorIds()]);
     this.categoriasSeleccionadas.set([...this.pendingCategoryIds()]);
+    this.booksStore.selectedAuthorIds.set([...this.pendingAuthorIds()]);
+    this.booksStore.selectedGenreIds.set([...this.pendingCategoryIds()]);
     this.authorFilterOpen.set(false);
   }
 
-  authorId(author: Autor): string {
-    return idAsString(author._id);
-  }
-
-  categoryId(category: Genero): string {
-    return idAsString(category._id);
-  }
-
-  saveBook(book: CrearLibro): void {
+  saveBook(book: CreateBookDto): void {
     this.saving.set(true);
     this.formError.set('');
-    this.bookService.createBook(book)
+    this.booksStore.create(book)
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false))).subscribe({
       next: (book) => {
-        this.books.update((books) => [book, ...books]);
-        this.toast.set('Libro creado correctamente.');
+        this.toastService.show('Libro creado correctamente.');
         this.closePanel();
       },
-      error: (error: HttpErrorResponse) => {
-        const message = apiErrorMessage(error, 'No se pudo guardar el libro. Revisa los datos e inténtalo de nuevo.');
-        this.formError.set(message);
+      error: (error: ApiError) => {
+        this.formError.set(this.errorMessage(error, 'No se pudo guardar el libro. Revisa los datos e inténtalo de nuevo.'));
       },
     });
   }
@@ -192,54 +160,52 @@ export class App {
 
   saveAuthor(value: EntityFormValue): void {
     this.saving.set(true);
-    this.authorService.createAuthor({ name: value.name, nationality: value.extra ?? '' })
+    this.authorsStore.create({ name: value.name, nationality: value.extra ?? '' })
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false))).subscribe({
         next: (author) => {
-          this.authors.update((authors) => [author, ...authors]);
-          this.toast.set('Autor creado correctamente.');
+          this.toastService.show('Autor creado correctamente.');
           this.closePanel();
         },
-        error: (error: HttpErrorResponse) => {
-          this.authorFormError.set(apiErrorMessage(error, 'No se pudo crear el autor.'));
+        error: (error: ApiError) => {
+          this.authorFormError.set(this.errorMessage(error, 'No se pudo crear el autor.'));
         },
       });
   }
 
   saveGenre(value: EntityFormValue): void {
     this.saving.set(true);
-    this.genreService.createGenre({ name: value.name, description: value.extra })
+    this.genresStore.create({ name: value.name, description: value.extra })
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false))).subscribe({
         next: (genre) => {
-          this.genres.update((genres) => [genre, ...genres]);
-          this.toast.set('Categoría creada correctamente.');
+          this.toastService.show('Categoría creada correctamente.');
           this.closePanel();
         },
-        error: (error: HttpErrorResponse) => {
-          this.genreFormError.set(apiErrorMessage(error, 'No se pudo crear la categoría.'));
+        error: (error: ApiError) => {
+          this.genreFormError.set(this.errorMessage(error, 'No se pudo crear la categoría.'));
         },
       });
   }
 
   clearToast(): void {
-    this.toast.set('');
+    this.toastService.clear();
   }
 
   closeAuthorFilter(): void {
     this.authorFilterOpen.set(false);
   }
 
-  requestBookDeletion(book: Libro): void {
-    this.pendingDeletion.set({ kind: 'book', id: idAsString(book._id), name: book.title });
+  requestBookDeletion(book: Book): void {
+    this.pendingDeletion.set({ kind: 'book', id: book._id, name: book.title });
     this.closeAuthorFilter();
   }
 
-  requestAuthorDeletion(author: Autor): void {
-    this.pendingDeletion.set({ kind: 'author', id: idAsString(author._id), name: author.name });
+  requestAuthorDeletion(author: Author): void {
+    this.pendingDeletion.set({ kind: 'author', id: author._id, name: author.name });
     this.closeAuthorFilter();
   }
 
-  requestCategoryDeletion(category: Genero): void {
-    this.pendingDeletion.set({ kind: 'genre', id: idAsString(category._id), name: category.name });
+  requestCategoryDeletion(category: Genre): void {
+    this.pendingDeletion.set({ kind: 'genre', id: category._id, name: category.name });
     this.closeAuthorFilter();
   }
 
@@ -257,10 +223,10 @@ export class App {
 
     this.borrando.set(target.id);
     const request = target.kind === 'book'
-      ? this.bookService.deleteBook(target.id)
+      ? this.booksStore.remove(target.id)
       : target.kind === 'author'
-        ? this.authorService.deleteAuthor(target.id)
-        : this.genreService.deleteGenre(target.id);
+        ? this.authorsStore.remove(target.id)
+        : this.genresStore.remove(target.id);
 
     request.pipe(
       takeUntilDestroyed(this.destroyRef),
@@ -268,26 +234,30 @@ export class App {
     ).subscribe({
       next: () => {
         if (target.kind === 'book') {
-          this.books.update((books) => books.filter((book) => idAsString(book._id) !== target.id));
+          this.booksStore.items.update((books) => books.filter((book) => book._id !== target.id));
         } else if (target.kind === 'author') {
-          this.authors.update((authors) => authors.filter((author) => idAsString(author._id) !== target.id));
+          this.authorsStore.items.update((authors) => authors.filter((author) => author._id !== target.id));
           this.autoresSeleccionados.update((ids) => ids.filter((id) => id !== target.id));
           this.pendingAuthorIds.update((ids) => ids.filter((id) => id !== target.id));
         } else {
-          this.genres.update((genres) => genres.filter((genre) => idAsString(genre._id) !== target.id));
+          this.genresStore.items.update((genres) => genres.filter((genre) => genre._id !== target.id));
           this.categoriasSeleccionadas.update((ids) => ids.filter((id) => id !== target.id));
           this.pendingCategoryIds.update((ids) => ids.filter((id) => id !== target.id));
         }
         this.pendingDeletion.set(null);
-        this.toast.set(`${this.entityLabel(target.kind)} eliminado correctamente.`);
+        this.toastService.show(`${this.entityLabel(target.kind)} eliminado correctamente.`);
       },
-      error: (error: HttpErrorResponse) => {
-        this.toast.set(apiErrorMessage(error, `No se pudo eliminar ${this.entityLabel(target.kind)}.`));
+      error: (error: ApiError) => {
+        this.toastService.show(this.errorMessage(error, `No se pudo eliminar ${this.entityLabel(target.kind)}.`));
       },
     });
   }
 
   entityLabel(kind: DeletionTarget['kind']): string {
     return kind === 'book' ? 'el libro' : kind === 'author' ? 'el autor' : 'la categoría';
+  }
+
+  private errorMessage(error: ApiError, fallback: string): string {
+    return error?.message || fallback;
   }
 }

@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Autor, CrearLibro, Genero } from '../../models/library';
-import { AuthorSelect } from '../author-select/author-select';
-import { idAsString } from '../../services/api-utils';
+import { Author } from '../../features/authors/models/author';
+import { CreateBookDto } from '../../features/books/models/book';
+import { Genre } from '../../features/genres/models/genre';
 
 interface BookFormControls {
   title: FormControl<string>;
@@ -15,7 +15,7 @@ interface BookFormControls {
 @Component({
   selector: 'app-book-form',
   standalone: true,
-  imports: [ReactiveFormsModule, AuthorSelect],
+  imports: [ReactiveFormsModule],
   templateUrl: './book-form.html',
   styles: [`
     form { display: grid; gap: 8px; }
@@ -28,11 +28,11 @@ interface BookFormControls {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookForm {
-  readonly authors = input.required<Autor[]>();
-  readonly genres = input.required<Genero[]>();
+  readonly authors = input.required<Author[]>();
+  readonly genres = input.required<Genre[]>();
   readonly saving = input(false);
   readonly errorMessage = input('');
-  readonly submitted = output<CrearLibro>();
+  readonly submitted = output<CreateBookDto>();
 
   readonly form = new FormGroup<BookFormControls>({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
@@ -63,19 +63,4 @@ export class BookForm {
     return control.invalid && control.touched;
   }
 
-  updateGenres(event: Event): void {
-    const select = event.target as HTMLSelectElement;
-    const genreIds = Array.from(select.selectedOptions, (option) => option.value);
-    this.form.controls.genreIds.setValue(genreIds);
-    this.form.controls.genreIds.markAsTouched();
-  }
-
-  updateAuthor(authorId: string): void {
-    this.form.controls.authorId.setValue(authorId);
-    this.form.controls.authorId.markAsTouched();
-  }
-
-  genreId(genre: Genero): string {
-    return idAsString(genre._id);
-  }
 }

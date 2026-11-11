@@ -55,35 +55,20 @@
   </section>
 </main>
 
-@if (toast()) {
-  <div class="toast" role="status">
-    <span aria-hidden="true">✓</span>{{ toast() }}
-    <button type="button" aria-label="Cerrar confirmación" (click)="clearToast()">×</button>
-  </div>
-}
+<app-toast />
 
 @if (pendingDeletion(); as target) {
-  <div class="modal-backdrop" (click)="cancelDeletion()">
-    <section class="confirm-modal glass-surface" role="alertdialog" aria-modal="true" aria-labelledby="delete-title" (click)="$event.stopPropagation()">
-      <h2 id="delete-title">¿Eliminar {{ target.name }}?</h2>
-      <p>Esta acción no se puede deshacer.</p>
-      @if (target.kind !== 'book') {
-        <p class="warning">El backend rechazará la operación si {{ target.kind === 'author' ? 'el autor tiene libros' : 'la categoría está asociada a libros' }}.</p>
-      }
-      <div class="confirm-actions">
-        <button type="button" class="cancel-button" [disabled]="borrando()" (click)="cancelDeletion()">Cancelar</button>
-        <button type="button" class="delete-button" [disabled]="borrando()" (click)="confirmDeletion()">
-          {{ borrando() ? 'Eliminando...' : 'Eliminar' }}
-        </button>
-      </div>
-    </section>
-  </div>
+  <app-confirm-dialog
+    [title]="'¿Eliminar ' + target.name + '?'"
+    [message]="target.kind === 'book' ? 'Esta acción no se puede deshacer.' : 'El backend rechazará la operación si la entidad está asociada a libros.'"
+    [working]="!!borrando()"
+    (cancelled)="cancelDeletion()"
+    (confirmed)="confirmDeletion()"
+  />
 }
 
 @if (activePanel()) {
-  <div class="modal-backdrop" (click)="closePanel()">
-    <section class="modal glass-surface" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
-      <button class="close" type="button" aria-label="Cerrar" (click)="closePanel()">×</button>
+  <app-modal (closed)="closePanel()">
       @if (activePanel() === 'book') {
         <h2>Añadir libro</h2>
         <app-book-form [authors]="authors()" [genres]="genres()" [saving]="saving()" [errorMessage]="formError()" (submitted)="saveBook($event)" />
@@ -94,6 +79,5 @@
         <h2>Añadir categoría</h2>
         <app-entity-form nameLabel="Nombre" extraLabel="Descripción" nameId="genre-name" extraId="genre-description" [saving]="saving()" [errorMessage]="genreFormError()" (submitted)="saveGenre($event)" />
       }
-    </section>
-  </div>
+  </app-modal>
 }

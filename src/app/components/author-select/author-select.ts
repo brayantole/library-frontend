@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { Autor } from '../../models/library';
-import { idAsString } from '../../services/api-utils';
+import { Author } from '../../features/authors/models/author';
 
 @Component({
   selector: 'app-author-select',
@@ -10,7 +9,7 @@ import { idAsString } from '../../services/api-utils';
     <select [id]="id()" [value]="value()" (change)="onSelectionChange($event)">
       <option value="">Selecciona un autor</option>
       @for (author of authors(); track author._id) {
-        <option [value]="authorId(author)">{{ author.name }}</option>
+        <option [value]="author._id">{{ author.name }}</option>
       }
     </select>
   `,
@@ -23,7 +22,7 @@ import { idAsString } from '../../services/api-utils';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class AuthorSelect {
-  readonly authors = input.required<Autor[]>();
+  readonly authors = input.required<Author[]>();
   readonly value = input('');
   readonly label = input('Autor');
   readonly id = input('author-select');
@@ -33,7 +32,4 @@ export class AuthorSelect {
     this.selected.emit((event.target as HTMLSelectElement).value);
   }
 
-  authorId(author: Autor): string {
-    return idAsString(author._id);
-  }
 }

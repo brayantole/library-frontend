@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { Libro } from '../../models/library';
-import { idAsString } from '../../services/api-utils';
+import { Book } from '../../features/books/models/book';
 import { GlassButton } from '../glass-button/glass-button';
 
 @Component({
@@ -27,17 +26,17 @@ import { GlassButton } from '../glass-button/glass-button';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookList {
-  readonly books = input.required<Libro[]>();
+  readonly books = input.required<Book[]>();
   readonly loading = input(false);
   readonly loaded = input(false);
   readonly deletingId = input<string | null>(null);
-  readonly deleteRequested = output<Libro>();
+  readonly deleteRequested = output<Book>();
 
-  bookId(book: Libro): string {
-    return idAsString(book._id);
+  bookId(book: Book): string {
+    return book._id;
   }
 
-  genreNames(book: Libro): string {
+  genreNames(book: Book): string {
     return (book.genres ?? []).map((genre) => genre.name).join(', ');
   }
 }

@@ -1,0 +1,30 @@
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <label for="title">Título</label>
+  <input id="title" type="text" formControlName="title" />
+  @if (isInvalid('title')) { <small>El título es obligatorio y debe tener al menos 2 caracteres.</small> }
+
+  <label for="isbn">ISBN</label>
+  <input id="isbn" type="text" formControlName="isbn" />
+  @if (isInvalid('isbn')) { <small>El ISBN es obligatorio y debe tener al menos 10 caracteres.</small> }
+
+  <app-author-select
+    [authors]="authors()"
+    [value]="form.controls.authorId.value"
+    (selected)="updateAuthor($event)"
+  />
+  @if (isInvalid('authorId')) { <small>Debes seleccionar un autor existente.</small> }
+
+  <label for="genreIds">Géneros</label>
+  <select id="genreIds" multiple (change)="updateGenres($event)">
+    @for (genre of genres(); track genre._id) {
+      <option [value]="genreId(genre)">{{ genre.name }}</option>
+    }
+  </select>
+  @if (isInvalid('genreIds')) { <small>Selecciona al menos un género.</small> }
+
+  <label for="year">Año (opcional)</label>
+  <input id="year" type="number" formControlName="year" />
+
+  @if (errorMessage()) { <p class="error" role="alert">{{ errorMessage() }}</p> }
+  <button type="submit" [disabled]="saving()"> {{ saving() ? 'Guardando...' : 'Guardar libro' }} </button>
+</form>

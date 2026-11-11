@@ -44,6 +44,23 @@ To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use th
 ng test
 ```
 
+## Funcionalidad del catálogo
+
+La aplicación carga autores y géneros al iniciar para alimentar los selectores, pero
+solo solicita los libros cuando se pulsa **Mostrar libros** o se cambia el filtro de
+autor. El alta usa un formulario reactivo y envía `authorId` y al menos un `genreId`,
+que son relaciones obligatorias en `api_biblioteca`.
+
+El filtro de autores admite selección múltiple: los checkboxes se confirman con
+**Ver libros** y una selección vacía representa **Todos**. Los formularios de alta
+se abren en un modal accesible y actualizan los selectores mediante signals sin
+recargar la página.
+
+El panel aplica los filtros de autores y categorías en el cliente porque la API
+actual expone `GET /books` sin parámetros de filtrado. La combinación de ambos
+filtros es una intersección: un libro debe coincidir con un autor seleccionado y
+con una categoría seleccionada cuando ambas listas no están vacías.
+
 ## Running end-to-end tests
 
 For end-to-end (e2e) testing, run:

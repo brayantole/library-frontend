@@ -1,0 +1,30 @@
+@if (loading()) {
+  <p class="loading" role="status"><span class="spinner" aria-hidden="true"></span>Cargando libros...</p>
+} @else if (!loaded()) {
+  <div class="empty-state"><span aria-hidden="true">◌</span><strong>Tu catálogo está listo</strong><p>Usa “Mostrar libros” para cargar tus libros.</p></div>
+} @else if (books().length === 0) {
+  <div class="empty-state"><span aria-hidden="true">⌁</span><strong>No hay libros aquí todavía</strong><p>Prueba otro filtro o crea tu primer libro.</p></div>
+} @else {
+  <ul class="book-list">
+    @for (book of books(); track book._id) {
+      <li>
+        <strong><span class="availability" [class.unavailable]="!book.available" aria-hidden="true"></span>{{ book.title }}</strong>
+        <span>ISBN: {{ book.isbn }}</span>
+        <span>Año: {{ book.year ?? 'No especificado' }}</span>
+        @if (book.author) {
+          <span>Autor: {{ book.author.name }}</span>
+        }
+        @if (book.genres?.length) {
+          <span>Categoría: {{ book.genres?.[0]?.name }}</span>
+        }
+        <app-glass-button
+          label="Eliminar"
+          width="92px"
+          height="36px"
+          [disabled]="deletingId() === bookId(book)"
+          (clicked)="deleteRequested.emit(book)"
+        />
+      </li>
+    }
+  </ul>
+}

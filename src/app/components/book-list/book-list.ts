@@ -36,4 +36,8 @@ export class BookList {
   bookId(book: Libro): string {
     return idAsString(book._id);
   }
+
+  genreNames(book: Libro): string {
+    return (book.genres ?? []).map((genre) => genre.name).join(', ');
+  }
 }

@@ -8,7 +8,7 @@ import { AuthorService } from './services/author';
 import { BookService } from './services/book';
 import { GenreService } from './services/genre';
 import { Autor, CrearLibro, Genero, Libro } from './models/library';
-import { apiErrorMessage, idAsString, textAsKey } from './services/api-utils';
+import { apiErrorMessage, idAsString } from './services/api-utils';
 import { EntityForm, EntityFormValue } from './components/entity-form/entity-form';
 import { AuthorFilter } from './components/author-filter/author-filter';
 import { GlassButton } from './components/glass-button/glass-button';
@@ -55,22 +55,12 @@ export class App {
   readonly filteredBooks = computed(() => {
     const authorIds = this.autoresSeleccionados();
     const categoryIds = this.categoriasSeleccionadas();
-    const selectedAuthorNames = this.authors()
-      .filter((author) => authorIds.includes(idAsString(author._id)))
-      .map((author) => textAsKey(author.name));
-    const selectedCategoryNames = this.genres()
-      .filter((category) => categoryIds.includes(idAsString(category._id)))
-      .map((category) => textAsKey(category.name));
     const search = this.searchTerm().trim().toLocaleLowerCase();
     return this.books().filter((book) => {
-      const authorKey = textAsKey(book.author?.name);
-      const categoryKeys = (book.genres ?? []).map((genre) => textAsKey(genre.name));
       const authorMatches = authorIds.length === 0
-        || (book.authorId !== undefined && authorIds.includes(idAsString(book.authorId)))
-        || selectedAuthorNames.includes(authorKey);
+        || authorIds.includes(idAsString(book.authorId));
       const categoryMatches = categoryIds.length === 0
-        || (book.genreIds ?? []).some((id) => categoryIds.includes(idAsString(id)))
-        || categoryKeys.some((key) => selectedCategoryNames.includes(key));
+        || (book.genreIds ?? []).some((id) => categoryIds.includes(idAsString(id)));
       const searchMatches = !search || book.title.toLocaleLowerCase().includes(search)
         || book.author?.name.toLocaleLowerCase().includes(search);
       return authorMatches && categoryMatches && searchMatches;
@@ -86,6 +76,7 @@ export class App {
       next: (genres) => this.genres.set(genres),
       error: () => this.formError.set('No se pudo cargar la lista de géneros.'),
     });
+    this.loadBooks();
   }
 
   @HostListener('window:keydown.escape')
@@ -150,14 +141,12 @@ export class App {
     this.clearAllPendingFilters();
     this.autoresSeleccionados.set([]);
     this.categoriasSeleccionadas.set([]);
-    this.loadBooks();
   }
 
   applyAuthorFilter(): void {
     this.autoresSeleccionados.set([...this.pendingAuthorIds()]);
     this.categoriasSeleccionadas.set([...this.pendingCategoryIds()]);
     this.authorFilterOpen.set(false);
-    this.loadBooks();
   }
 
   authorId(author: Autor): string {
@@ -173,10 +162,10 @@ export class App {
     this.formError.set('');
     this.bookService.createBook(book)
       .pipe(takeUntilDestroyed(this.destroyRef), finalize(() => this.saving.set(false))).subscribe({
-      next: () => {
+      next: (book) => {
+        this.books.update((books) => [book, ...books]);
         this.toast.set('Libro creado correctamente.');
         this.closePanel();
-        this.loadBooks();
       },
       error: (error: HttpErrorResponse) => {
         const message = apiErrorMessage(error, 'No se pudo guardar el libro. Revisa los datos e inténtalo de nuevo.');

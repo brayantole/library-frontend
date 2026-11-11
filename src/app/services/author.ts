@@ -1,22 +1,12 @@
-import { HttpClient } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Autor } from '../models/library';
+import { Injectable } from '@angular/core';
+import { ApiService } from '../core/api/api.service';
+import { Author, CreateAuthorDto, UpdateAuthorDto } from '../features/authors/models/author';
 
 @Injectable({ providedIn: 'root' })
-export class AuthorService {
-  private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'https://api-library-0zeb.onrender.com/api/v1/authors';
+export class AuthorService extends ApiService<Author, CreateAuthorDto, UpdateAuthorDto> {
+  protected readonly resource = 'authors';
 
-  getAuthors(): Observable<Autor[]> {
-    return this.http.get<Autor[]>(this.apiUrl);
-  }
-
-  createAuthor(author: { name: string; nationality: string }): Observable<Autor> {
-    return this.http.post<Autor>(this.apiUrl, author);
-  }
-
-  deleteAuthor(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+  getAuthors() { return this.getAll(); }
+  createAuthor(author: CreateAuthorDto) { return this.create(author); }
+  deleteAuthor(id: string) { return this.delete(id); }
 }

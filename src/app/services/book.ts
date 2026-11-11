@@ -1,25 +1,12 @@
-import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { CrearLibro, Libro } from '../models/library';
+import { Injectable } from '@angular/core';
+import { ApiService } from '../core/api/api.service';
+import { Book, CreateBookDto, UpdateBookDto } from '../features/books/models/book';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class BookService {
-  private http = inject(HttpClient);
-  
-  private readonly apiUrl = 'https://api-library-0zeb.onrender.com/api/v1/books';
+@Injectable({ providedIn: 'root' })
+export class BookService extends ApiService<Book, CreateBookDto, UpdateBookDto> {
+  protected readonly resource = 'books';
 
-  getBooks(): Observable<Libro[]> {
-    return this.http.get<Libro[]>(this.apiUrl);
-  }
-
-  createBook(bookData: CrearLibro): Observable<Libro> {
-    return this.http.post<Libro>(this.apiUrl, bookData);
-  }
-
-  deleteBook(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
+  getBooks() { return this.getAll(); }
+  createBook(book: CreateBookDto) { return this.create(book); }
+  deleteBook(id: string) { return this.delete(id); }
 }

@@ -4,6 +4,7 @@ import { App } from './app';
 import { AuthorService } from './services/author';
 import { BookService } from './services/book';
 import { GenreService } from './services/genre';
+import { API_BASE_URL } from './core/config/api.config';
 
 describe('App', () => {
   beforeEach(async () => {
@@ -13,6 +14,7 @@ describe('App', () => {
         { provide: AuthorService, useValue: { getAuthors: () => of([]) } },
         { provide: BookService, useValue: { getBooks: () => of([]), createBook: () => of({}) } },
         { provide: GenreService, useValue: { getGenres: () => of([]) } },
+        { provide: API_BASE_URL, useValue: 'http://localhost:3000/api/v1' },
       ],
     })
       .compileComponents();
@@ -31,7 +33,7 @@ describe('App', () => {
     expect(compiled.querySelector('h1')?.textContent).toContain('Tu biblioteca');
   });
 
-  it('filters real API books by related author and category names when IDs are omitted', () => {
+  it('filters books by the API author and genre IDs', () => {
     const fixture = TestBed.createComponent(App);
     const app = fixture.componentInstance;
 
@@ -43,14 +45,18 @@ describe('App', () => {
         title: 'Libro filtrable',
         isbn: '1234567890',
         available: true,
+        authorId: 'author-1',
+        genreIds: ['genre-1'],
         author: { name: 'Autor Uno', nationality: 'ES' },
-        genres: [{ name: 'Ficción' }],
+        genres: [{ _id: 'genre-1', name: 'Ficción' }],
       },
       {
         _id: 'book-2',
         title: 'Otro libro',
         isbn: '0987654321',
         available: true,
+        authorId: 'author-2',
+        genreIds: ['genre-2'],
         author: { name: 'Otro Autor', nationality: 'ES' },
         genres: [{ name: 'Historia' }],
       },

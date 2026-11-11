@@ -1,0 +1,12 @@
+.filter-wrap { position: relative; }
+.author-popover { position: absolute; top: calc(100% + 10px); left: 0; width: 280px; padding: 16px; color: #f8fafc; background: rgba(15, 23, 42, .94); border: 1px solid rgba(255, 255, 255, .1); border-radius: 15px; box-shadow: 0 18px 38px rgba(0, 0, 0, .36); backdrop-filter: blur(18px); }
+.popover-heading { display: flex; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+.text-button, .close-button { color: #f8fafc; background: transparent; }
+.close-button { width: 100%; margin-top: 8px; padding: 8px; border: 1px solid rgba(255, 255, 255, .18); }
+.author-option { display: flex; gap: 9px; align-items: center; justify-content: space-between; padding: 9px 5px; color: #f8fafc; border-radius: 8px; }
+.author-option label { display: flex; flex: 1; gap: 9px; align-items: center; cursor: pointer; }
+.icon-button { min-width: 32px; min-height: 32px; color: #f8fafc; background: transparent; border: 1px solid rgba(255,255,255,.15); }
+.section-divider { height: 1px; margin: 10px 0; background: rgba(255, 255, 255, .1); }
+.section-label { margin: 6px 5px 2px; color: #c4b5fd; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.muted { color: #94a3b8; font-size: 12px; }
+@media (max-width: 760px) { .author-popover { position: fixed; top: auto; right: 12px; bottom: 12px; left: 12px; width: auto; } }

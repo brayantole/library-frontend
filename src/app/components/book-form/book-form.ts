@@ -14,17 +14,8 @@ interface BookFormControls {
 
 @Component({
   selector: 'app-book-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './book-form.html',
-  styles: [`
-    form { display: grid; gap: 8px; }
-    input, select { box-sizing: border-box; width: 100%; padding: 10px; color: #334155; background: #ffffff9e; border: 1px solid #cbd5e180; border-radius: 8px; font: inherit; box-shadow: inset 1px 1px 3px #64748b14; }
-    select[multiple] { min-height: 92px; }
-    input:focus, select:focus { border-color: #818cf8; outline: 0; box-shadow: 0 0 0 4px #818cf833, inset 1px 1px 3px #64748b14; }
-    small, .error { color: #b42318; font-size: 12px; }
-    form > button { margin-top: 8px; padding: 11px; color: #fff; background: linear-gradient(135deg, #4f46e5, #7c3aed); border: 0; border-radius: 9px; cursor: pointer; }
-  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookForm {

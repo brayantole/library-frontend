@@ -8,7 +8,6 @@ export interface EntityFormValue {
 
 @Component({
   selector: 'app-entity-form',
-  standalone: true,
   imports: [ReactiveFormsModule],
   template: `
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
@@ -26,14 +25,6 @@ export interface EntityFormValue {
       <button type="submit" [disabled]="saving()">{{ saving() ? 'Guardando...' : submitLabel() }}</button>
     </form>
   `,
-  styles: [`
-    form { display: grid; gap: 8px; }
-    label { color: #475569; font-size: 13px; font-weight: 600; }
-    input, textarea { box-sizing: border-box; width: 100%; padding: 10px; color: #334155; background: #ffffff9e; border: 1px solid #cbd5e180; border-radius: 8px; font: inherit; box-shadow: inset 1px 1px 3px #64748b14; }
-    input:focus, textarea:focus { border-color: #818cf8; outline: 0; box-shadow: 0 0 0 4px #818cf833; }
-    small, .error { color: #b42318; font-size: 12px; }
-    form button { margin-top: 8px; padding: 11px; color: #fff; background: linear-gradient(135deg, #4f46e5, #7c3aed); border: 0; border-radius: 9px; cursor: pointer; }
-  `],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityForm {

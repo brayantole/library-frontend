@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, input, output } from '@angular/core
 
 @Component({
   selector: 'app-glass-button',
-  standalone: true,
   template: `
     <div class="button-wrap" [style.--w]="width()" [style.--h]="height()" [style.--r]="radius()" [style.--tr]="highlight()">
       <button type="button" [disabled]="disabled()" [attr.aria-label]="label()" [attr.aria-expanded]="ariaExpanded()" [attr.aria-haspopup]="hasPopup() ? 'dialog' : null" (click)="clicked.emit()">

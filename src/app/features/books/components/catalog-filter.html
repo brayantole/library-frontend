@@ -1,0 +1,26 @@
+<div class="filter-wrap">
+  <app-glass-button
+    [label]="'Mostrar libros' + (filter.selectedAuthorIds().length ? ' · ' + filter.selectedAuthorIds().length + ' autores' : '') + (filter.selectedGenreIds().length ? ' · ' + filter.selectedGenreIds().length + ' categorías' : '')"
+    [ariaExpanded]="open()" [hasPopup]="true" width="260px" (clicked)="toggle(); opened.emit()"
+  />
+  @if (open()) {
+    <section class="author-popover" role="dialog" aria-label="Filtrar por autores">
+      <div class="popover-heading"><strong>Filtrar catálogo</strong><button type="button" class="text-button" (click)="clear()">Limpiar todo</button></div>
+      @for (author of authors(); track author._id) {
+        <div class="author-option">
+          <label><input type="checkbox" [checked]="pendingAuthorIds().includes(author._id)" (change)="toggleAuthor(author._id)" /><span>{{ author.name }}</span></label>
+          <button type="button" class="icon-button" aria-label="Eliminar autor" title="Eliminar autor" (click)="authorDelete.emit(author)">⌫</button>
+        </div>
+      } @empty { <p class="muted">No hay autores disponibles.</p> }
+      <div class="section-divider"></div><div class="section-label">Categorías</div>
+      @for (genre of genres(); track genre._id) {
+        <div class="author-option">
+          <label><input type="checkbox" [checked]="pendingGenreIds().includes(genre._id)" (change)="toggleGenre(genre._id)" /><span>{{ genre.name }}</span></label>
+          <button type="button" class="icon-button" aria-label="Eliminar categoría" title="Eliminar categoría" (click)="genreDelete.emit(genre)">⌫</button>
+        </div>
+      } @empty { <p class="muted">No hay categorías disponibles.</p> }
+      <app-glass-button label="Ver libros" width="100%" (clicked)="apply()" />
+      <button type="button" class="close-button" (click)="closed.emit()">Cerrar</button>
+    </section>
+  }
+</div>

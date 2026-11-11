@@ -1,1 +1,129 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  color-scheme: dark;
+  --bg: #0b0f19;
+  --surface: rgba(255,255,255,.06);
+  --surface-strong: rgba(255,255,255,.10);
+  --border: rgba(255,255,255,.12);
+  --text: #f1f5f9;
+  --text-2: #cbd5e1;
+  --text-muted: #94a3b8;
+  --primary: #6366f1;
+  --primary-2: #8b5cf6;
+  --accent: #67e8f9;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #fb7185;
+  --focus: #a5b4fc;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% 4%, rgba(99,102,241,.22), transparent 34%),
+    radial-gradient(circle at 88% 18%, rgba(139,92,246,.18), transparent 32%),
+    radial-gradient(circle at 50% 100%, rgba(103,232,249,.12), transparent 38%),
+    var(--bg);
+  font-family: system-ui, sans-serif;
+}
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+  opacity: .35;
+  background-image: radial-gradient(circle, rgba(255,255,255,.45) 0 1px, transparent 1px);
+  background-size: 47px 53px;
+}
+button, input, select, textarea { font: inherit; }
+button { border: 0; border-radius: var(--radius-sm); cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+.glass-surface {
+  border: 1px solid var(--border);
+  background: linear-gradient(145deg, var(--surface-strong), var(--surface));
+  box-shadow: 0 8px 32px rgba(0,0,0,.36);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.modal-backdrop {
+  position: fixed;
+  z-index: 10;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-5);
+  background: rgba(5,8,20,.6);
+  backdrop-filter: blur(4px);
+}
+.modal { position: relative; width: min(520px,100%); max-height: 90vh; overflow: auto; padding: 28px; border-radius: var(--radius-lg); }
+.confirm-modal { width: min(420px,100%); padding: 26px; border-radius: var(--radius-lg); }
+.confirm-modal p { color: var(--text-2); }
+.confirm-actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: 22px; }
+.cancel-button, .delete-button { min-height: 40px; padding: 10px 15px; color: var(--text); border: 1px solid var(--border); }
+.cancel-button { background: var(--surface); }
+.delete-button { background: #9f1239; }
+.cancel-button:disabled, .delete-button:disabled { cursor: wait; opacity: .55; }
+.close { position: absolute; top: 10px; right: 12px; padding: 3px 9px; color: var(--text-2); font-size: 24px; background: transparent; }
+form { display: grid; gap: var(--space-2); }
+label { color: var(--text-2); font-size: 13px; font-weight: 600; }
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+input::placeholder { color: var(--text-muted); opacity: 1; }
+select option { color: var(--text); background: #161b2a; }
+select[multiple] { min-height: 92px; }
+small, .error { color: #fca5a5; font-size: 12px; }
+form > button, form button { min-height: 40px; margin-top: var(--space-2); padding: 11px; color: var(--text); background: linear-gradient(135deg, var(--primary), var(--primary-2)); }
+.book-list { display: grid; gap: var(--space-3); padding: 0; list-style: none; }
+.book-list li {
+  display: grid;
+  gap: var(--space-2);
+  padding: 18px;
+  color: var(--text-2);
+  background: linear-gradient(145deg, var(--surface-strong), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 20px rgba(0,0,0,.2);
+  backdrop-filter: blur(8px);
+  transition: box-shadow .25s;
+}
+.book-list li:hover { box-shadow: 0 12px 26px rgba(0,0,0,.3); }
+.book-list strong { color: var(--text); font-size: 17px; }
+.book-list span:not(.availability) { color: var(--text-muted); font-size: 13px; }
+.availability { display: inline-block; width: 9px; height: 9px; margin-right: 8px; background: var(--success); border-radius: 50%; }
+.availability.unavailable { background: var(--danger); }
+.availability-badge { width: fit-content; padding: 3px 8px; color: var(--success) !important; background: rgba(52,211,153,.12); border-radius: 999px; }
+.availability-badge.unavailable { color: var(--danger) !important; background: rgba(251,113,133,.12); }
+.genre-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.genre-chip { padding: 3px 8px; color: var(--accent) !important; background: rgba(103,232,249,.1); border-radius: 999px; }
+.loading { display: flex; align-items: center; gap: 9px; color: var(--text-2); }
+.empty-state { display: grid; justify-items: center; gap: 6px; padding: 58px 20px; color: var(--text-muted); text-align: center; }
+.empty-state > span { color: var(--accent); font-size: 38px; }
+.empty-state strong { color: var(--text-2); }
+.empty-state p { margin: 0; font-size: 13px; }
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(165,180,252,.35); border-top-color: var(--focus); border-radius: 50%; animation: spin .8s linear infinite; }
+.toast { position: fixed; z-index: 20; right: 22px; bottom: 22px; display: flex; align-items: center; gap: 9px; padding: 13px 15px; color: var(--text); background: rgba(6,78,59,.9); border: 1px solid var(--success); border-radius: var(--radius-md); box-shadow: 0 12px 30px rgba(0,0,0,.3); }
+.toast button { padding: 0 3px; color: var(--text-2); background: transparent; font-size: 18px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+@media (max-width: 760px) { .modal-backdrop { align-items: end; padding: 0; } .modal { width: 100%; max-height: 92vh; border-radius: 20px 20px 0 0; } }

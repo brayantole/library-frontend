@@ -1,0 +1,28 @@
+<main class="shell">
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">B</span><span>Biblioteca</span></div>
+    <app-glass-button class="add-button" label="＋ Añadir libro" width="100%" (clicked)="dialog.open('book')" />
+    <div class="sidebar-note"><span class="sidebar-icon" aria-hidden="true">✦</span><span>Organiza tu catálogo<br />de forma sencilla.</span></div>
+    <div class="sidebar-actions">
+      <app-glass-button class="side-action" label="＋ Añadir autor" width="100%" (clicked)="dialog.open('author')" />
+      <app-glass-button class="side-action" label="＋ Añadir categoría" width="100%" (clicked)="dialog.open('genre')" />
+    </div>
+  </aside>
+  <router-outlet />
+</main>
+<app-toast />
+@if (confirm.active(); as confirmation) {
+  <app-confirm-dialog
+    [title]="confirmation.title"
+    [message]="confirmation.message"
+    [working]="confirm.working()"
+    [error]="confirm.error()"
+    (cancelled)="confirm.cancel()"
+    (confirmed)="confirm.accept()"
+  />
+}
+@switch (dialog.active()) {
+  @case ('book') { <app-book-create-dialog /> }
+  @case ('author') { <app-author-create-dialog /> }
+  @case ('genre') { <app-genre-create-dialog /> }
+}

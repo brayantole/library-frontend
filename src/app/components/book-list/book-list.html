@@ -1,5 +1,5 @@
 @if (loading()) {
-  <p class="loading" role="status"><span class="spinner" aria-hidden="true"></span>Cargando libros...</p>
+  <p class="loading" role="status"><span class="spinner" aria-hidden="true"></span>Despertando el servidor…</p>
 } @else if (!loaded()) {
   <div class="empty-state"><span aria-hidden="true">◌</span><strong>Tu catálogo está listo</strong><p>Agrega un libro para comenzar.</p></div>
 } @else if (books().length === 0) {
@@ -9,14 +9,16 @@
     @for (book of books(); track book._id) {
       <li>
         <strong><span class="availability" [class.unavailable]="!book.available" aria-hidden="true"></span>{{ book.title }}</strong>
-        <span>{{ book.available ? 'Disponible' : 'Prestado' }}</span>
+        <span class="availability-badge" [class.unavailable]="!book.available">{{ book.available ? 'Disponible' : 'Prestado' }}</span>
         <span>ISBN: {{ book.isbn }}</span>
         <span>Año: {{ book.year ?? 'No especificado' }}</span>
         @if (book.author) {
           <span>Autor: {{ book.author.name }}</span>
         }
         @if (book.genres?.length) {
-          <span>Categorías: {{ genreNames(book) }}</span>
+          <span class="genre-chips" aria-label="Géneros">
+            @for (genre of book.genres; track genre._id) { <span class="genre-chip">{{ genre.name }}</span> }
+          </span>
         }
         <app-glass-button
           label="Eliminar"

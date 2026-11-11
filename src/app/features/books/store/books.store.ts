@@ -16,6 +16,15 @@ export class BooksStore extends EntityStore<Book, CreateBookDto, UpdateBookDto> 
       && (!search || book.title.toLocaleLowerCase().includes(search) || book.author?.name.toLocaleLowerCase().includes(search)));
   });
 
+  setFilters(authorIds: string[], genreIds: string[]): void {
+    this.selectedAuthorIds.set(authorIds);
+    this.selectedGenreIds.set(genreIds);
+  }
+
+  clearFilters(): void {
+    this.setFilters([], []);
+  }
+
   constructor() {
     super(inject(BookService));
   }

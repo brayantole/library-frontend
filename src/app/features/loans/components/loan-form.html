@@ -1,0 +1,29 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (initialValue()) {
+    <label>Libro</label>
+    <p class="readonly-book">{{ books().find(book => book._id === initialValue()?.bookId)?.title ?? 'Libro eliminado' }}</p>
+  } @else {
+    <label for="loan-book">Libro</label>
+    @if (books().length > 0) {
+      <select id="loan-book" formControlName="bookId">
+        <option value="">Selecciona un libro</option>
+        @for (book of books(); track book._id) {
+          <option [value]="book._id">{{ book.title }} — {{ book.author?.name ?? 'Autor desconocido' }}</option>
+        }
+      </select>
+    } @else {
+      <p class="hint">No hay libros disponibles para prestar.</p>
+    }
+  }
+  <label for="loan-user">Nombre de quien lo recibe</label>
+  <input id="loan-user" type="text" formControlName="userName" />
+  @if (form.controls.userName.invalid && form.controls.userName.touched) {
+    <small>El nombre es obligatorio y debe tener entre 2 y 120 caracteres.</small>
+  }
+  <label for="loan-date">Fecha del préstamo</label>
+  <input id="loan-date" type="date" formControlName="loanDate" />
+  @if (errorMessage()) { <p class="error" role="alert">{{ errorMessage() }}</p> }
+  <button type="submit" [disabled]="saving() || (!initialValue() && books().length === 0)">
+    {{ saving() ? 'Guardando…' : (initialValue() ? 'Guardar cambios' : 'Registrar préstamo') }}
+  </button>
+</form>

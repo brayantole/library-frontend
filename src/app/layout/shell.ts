@@ -1,19 +1,20 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { DialogService } from '../core/ui/dialog.service';
 import { ConfirmService } from '../core/ui/confirm.service';
 import { GlassButton } from '../components/glass-button/glass-button';
 import { Toast } from '../shared/ui/toast';
 import { ConfirmDialog } from '../shared/ui/confirm-dialog';
-import { BookCreateDialog } from '../features/books/components/book-create-dialog';
-import { AuthorCreateDialog } from '../features/authors/components/author-create-dialog';
-import { GenreCreateDialog } from '../features/genres/components/genre-create-dialog';
+import { BookDialog } from '../features/books/components/book-dialog';
+import { AuthorDialog } from '../features/authors/components/author-dialog';
+import { GenreDialog } from '../features/genres/components/genre-dialog';
+import { LoanDialog } from '../features/loans/components/loan-dialog';
 
 @Component({
   selector: 'app-shell',
-  imports: [RouterOutlet, GlassButton, Toast, ConfirmDialog, BookCreateDialog, AuthorCreateDialog, GenreCreateDialog],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, GlassButton, Toast, ConfirmDialog, BookDialog, AuthorDialog, GenreDialog, LoanDialog],
   templateUrl: './shell.html',
-  styleUrl: '../app.scss',
+  styleUrl: './shell.scss',
   host: { '(window:keydown.escape)': 'closeTransientMenus()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -9,6 +9,7 @@
       @for (author of authors(); track author._id) {
         <div class="author-option">
           <label><input type="checkbox" [checked]="pendingAuthorIds().includes(author._id)" (change)="toggleAuthor(author._id)" /><span>{{ author.name }}</span></label>
+          <button type="button" class="icon-button" aria-label="Editar autor" title="Editar autor" (click)="authorEdit.emit(author)">✎</button>
           <button type="button" class="icon-button" aria-label="Eliminar autor" title="Eliminar autor" (click)="authorDelete.emit(author)">⌫</button>
         </div>
       } @empty { <p class="muted">No hay autores disponibles.</p> }
@@ -16,6 +17,7 @@
       @for (genre of genres(); track genre._id) {
         <div class="author-option">
           <label><input type="checkbox" [checked]="pendingGenreIds().includes(genre._id)" (change)="toggleGenre(genre._id)" /><span>{{ genre.name }}</span></label>
+          <button type="button" class="icon-button" aria-label="Editar categoría" title="Editar categoría" (click)="genreEdit.emit(genre)">✎</button>
           <button type="button" class="icon-button" aria-label="Eliminar categoría" title="Eliminar categoría" (click)="genreDelete.emit(genre)">⌫</button>
         </div>
       } @empty { <p class="muted">No hay categorías disponibles.</p> }

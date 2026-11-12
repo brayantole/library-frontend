@@ -1,0 +1,4 @@
+<app-modal (closed)="dialog.close()">
+  <h2>{{ initialValue() ? 'Editar categoría' : 'Añadir categoría' }}</h2>
+  <app-entity-form nameLabel="Nombre" extraLabel="Descripción" nameId="genre-name" extraId="genre-description" [extraRequired]="!!initialValue()?.description" [initialValue]="initialValue() ? { name: initialValue()!.name, extra: initialValue()!.description } : null" [saving]="saving()" [errorMessage]="error()" (submitted)="save($event)" />
+</app-modal>

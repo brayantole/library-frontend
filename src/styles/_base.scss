@@ -1,0 +1,25 @@
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 12% 4%, rgba(99,102,241,.22), transparent 34%),
+    radial-gradient(circle at 88% 18%, rgba(139,92,246,.18), transparent 32%),
+    radial-gradient(circle at 50% 100%, rgba(103,232,249,.12), transparent 38%),
+    var(--bg);
+  font-family: system-ui, sans-serif;
+}
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+  opacity: .35;
+  background-image: radial-gradient(circle, rgba(255,255,255,.45) 0 1px, transparent 1px);
+  background-size: 47px 53px;
+}
+button, input, select, textarea { font: inherit; }
+button { border: 0; border-radius: var(--radius-sm); cursor: pointer; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }

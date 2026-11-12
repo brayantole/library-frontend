@@ -1,0 +1,47 @@
+<section class="content">
+  <div class="topbar">
+    <div><p class="eyebrow">GESTIÓN</p><h1>Préstamos</h1></div>
+    <app-glass-button label="＋ Nuevo préstamo" width="180px" height="42px" (clicked)="dialog.open('loan')" />
+  </div>
+  <div class="toolbar">
+    <div class="filters" role="group" aria-label="Filtrar préstamos">
+      <button type="button" [class.active]="status() === 'all'" (click)="status.set('all')">Todos</button>
+      <button type="button" [class.active]="status() === 'active'" (click)="status.set('active')">Activos</button>
+      <button type="button" [class.active]="status() === 'returned'" (click)="status.set('returned')">Devueltos</button>
+    </div>
+    <label class="search glass-surface">
+      <span aria-hidden="true">⌕</span>
+      <input type="search" placeholder="Buscar usuario o libro" [value]="searchTerm()" (input)="setSearch($event)" />
+    </label>
+    <span class="loan-count">{{ filteredLoans().length }} préstamo{{ filteredLoans().length === 1 ? '' : 's' }}</span>
+  </div>
+  @if (loans.loading()) {
+    <p class="loading" role="status"><span class="spinner" aria-hidden="true"></span>Despertando el servidor…</p>
+  } @else if (loans.error()) {
+    <div class="state error-state"><strong>No pudimos cargar los préstamos.</strong><p>{{ loans.error() }}</p><button type="button" (click)="retry()">Reintentar</button></div>
+  } @else if (loans.loaded() && filteredLoans().length === 0) {
+    <div class="state"><strong>No hay préstamos que mostrar</strong><p>Registra un préstamo para comenzar.</p></div>
+  } @else if (!loans.loaded()) {
+    <div class="state"><strong>Tus préstamos aparecerán aquí</strong></div>
+  } @else {
+    <ul class="loan-list">
+      @for (loan of filteredLoans(); track loan._id) {
+        <li class="glass-surface">
+          <strong>{{ bookTitle(loan) }}</strong>
+          <span>Autor: {{ authorName(loan) }}</span>
+          <span>Usuario: {{ loan.userName }}</span>
+          <span>Prestado el {{ formatDate(loan.loanDate) }}</span>
+          <span class="status-badge" [class.returned]="loan.returned">{{ loan.returned ? 'Devuelto' : 'Activo' }}</span>
+          @if (loan.returnDate) { <span>Devuelto el {{ formatDate(loan.returnDate) }}</span> }
+          <div class="loan-actions">
+            @if (!loan.returned) {
+              <app-glass-button label="Marcar como devuelto" width="190px" height="36px" (clicked)="returnLoan(loan)" />
+              <app-glass-button label="Editar" width="92px" height="36px" (clicked)="editLoan(loan)" />
+            }
+            <app-glass-button label="Eliminar" width="92px" height="36px" (clicked)="deleteLoan(loan)" />
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</section>

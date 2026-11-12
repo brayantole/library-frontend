@@ -7,6 +7,7 @@ import { Book } from '../models/book';
 import { Author } from '../../authors/models/author';
 import { Genre } from '../../genres/models/genre';
 import { ConfirmService } from '../../../core/ui/confirm.service';
+import { DialogService } from '../../../core/ui/dialog.service';
 import { CatalogFilter } from '../components/catalog-filter';
 
 @Component({
@@ -23,6 +24,7 @@ export class BooksPage {
   readonly genres = inject(GenresStore);
   readonly confirm = inject(ConfirmService);
   readonly filterOpen = signal(false);
+  readonly dialog = inject(DialogService);
 
   constructor() {
     this.books.load();
@@ -42,11 +44,23 @@ export class BooksPage {
     this.confirm.confirmDelete({ title: `¿Eliminar ${book.title}?`, message: 'Esta acción no se puede deshacer.', action: () => this.books.remove(book._id) });
   }
 
+  editBook(book: Book): void { this.dialog.open('book', book); }
+
+  loanBook(book: Book): void {
+    if (book.available) {
+      this.dialog.open('loan', undefined, book._id);
+    }
+  }
+
   deleteAuthor(author: Author): void {
     this.confirm.confirmDelete({ title: `¿Eliminar ${author.name}?`, message: 'El backend rechazará autores asociados a libros.', action: () => this.authors.remove(author._id) });
   }
 
+  editAuthor(author: Author): void { this.filterOpen.set(false); this.dialog.open('author', author); }
+
   deleteGenre(genre: Genre): void {
     this.confirm.confirmDelete({ title: `¿Eliminar ${genre.name}?`, message: 'El backend rechazará categorías asociadas a libros.', action: () => this.genres.remove(genre._id) });
   }
+
+  editGenre(genre: Genre): void { this.filterOpen.set(false); this.dialog.open('genre', genre); }
 }

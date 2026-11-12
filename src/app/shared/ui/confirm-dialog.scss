@@ -1,0 +1,7 @@
+.confirm-modal { width: min(420px, 100%); padding: 26px; border-radius: var(--radius-lg); }
+.confirm-modal p { color: var(--text-2); }
+.confirm-actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: 22px; }
+.cancel-button, .delete-button { min-height: 40px; padding: 10px 15px; color: var(--text); border: 1px solid var(--border); }
+.cancel-button { background: var(--surface); }
+.delete-button { background: #9f1239; }
+.cancel-button:disabled, .delete-button:disabled { cursor: wait; opacity: .55; }

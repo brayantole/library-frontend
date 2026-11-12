@@ -1,30 +1,18 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 export interface EntityFormValue {
   name: string;
   extra?: string;
+  birthYear?: number;
 }
+export interface EntityFormInitialValue extends EntityFormValue {}
 
 @Component({
   selector: 'app-entity-form',
   imports: [ReactiveFormsModule],
-  template: `
-    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-      <label [for]="nameId()">{{ nameLabel() }}</label>
-      <input [id]="nameId()" type="text" formControlName="name" />
-      @if (form.controls.name.invalid && form.controls.name.touched) {
-        <small>{{ nameLabel() }} es obligatorio y debe tener entre 2 y 120 caracteres.</small>
-      }
-      <label [for]="extraId()">{{ extraLabel() }} (opcional)</label>
-      <textarea [id]="extraId()" formControlName="extra" rows="3"></textarea>
-      @if (extraRequired() && form.controls.extra.touched && !form.controls.extra.value.trim()) {
-        <small>{{ extraLabel() }} es obligatorio.</small>
-      }
-      @if (errorMessage()) { <p class="error" role="alert">{{ errorMessage() }}</p> }
-      <button type="submit" [disabled]="saving()">{{ saving() ? 'Guardando...' : submitLabel() }}</button>
-    </form>
-  `,
+  templateUrl: './entity-form.html',
+  styleUrl: './entity-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EntityForm {
@@ -33,15 +21,31 @@ export class EntityForm {
   readonly nameId = input.required<string>();
   readonly extraId = input.required<string>();
   readonly extraRequired = input(false);
+  readonly showBirthYear = input(false);
   readonly submitLabel = input('Guardar');
   readonly saving = input(false);
   readonly errorMessage = input('');
   readonly submitted = output<EntityFormValue>();
+  readonly initialValue = input<EntityFormInitialValue | null>(null);
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2), Validators.maxLength(120)] }),
     extra: new FormControl('', { nonNullable: true, validators: [Validators.maxLength(500)] }),
+    birthYear: new FormControl<number | null>(null, [Validators.min(1), Validators.max(new Date().getFullYear())]),
   });
+
+  constructor() {
+    effect(() => {
+      const value = this.initialValue();
+      if (value) {
+        this.form.patchValue({ name: value.name, extra: value.extra ?? '', birthYear: value.birthYear ?? null });
+        if (this.showBirthYear() && value.birthYear !== undefined) {
+          this.form.controls.birthYear.addValidators(Validators.required);
+          this.form.controls.birthYear.updateValueAndValidity();
+        }
+      }
+    });
+  }
 
   submit(): void {
     if (this.form.invalid || (this.extraRequired() && !this.form.controls.extra.value.trim())) {
@@ -49,6 +53,10 @@ export class EntityForm {
       return;
     }
     const value = this.form.getRawValue();
-    this.submitted.emit({ name: value.name.trim(), extra: value.extra.trim() || undefined });
+    this.submitted.emit({
+      name: value.name.trim(),
+      extra: value.extra.trim() || undefined,
+      ...(value.birthYear === null ? {} : { birthYear: value.birthYear }),
+    });
   }
 }

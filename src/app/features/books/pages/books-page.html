@@ -3,12 +3,12 @@
     <label class="search glass-surface"><span aria-hidden="true">⌕</span><input type="search" placeholder="Buscar libros..." aria-label="Buscar libros" (input)="search($event)" /></label>
   </header>
   <div class="toolbar" (click)="$event.stopPropagation()">
-    <app-catalog-filter [authors]="authors.items()" [genres]="genres.items()" [open]="filterOpen()" (opened)="filterOpen.set(true)" (closed)="filterOpen.set(false)" (authorDelete)="deleteAuthor($event)" (genreDelete)="deleteGenre($event)" />
+    <app-catalog-filter [authors]="authors.items()" [genres]="genres.items()" [open]="filterOpen()" (opened)="filterOpen.set(true)" (closed)="filterOpen.set(false)" (authorDelete)="deleteAuthor($event)" (genreDelete)="deleteGenre($event)" (authorEdit)="editAuthor($event)" (genreEdit)="editGenre($event)" />
     <button class="refresh-button" type="button" (click)="books.load()" [disabled]="books.loading()">Actualizar</button>
     <span class="book-count">{{ books.filteredBooks().length }} libros</span>
   </div>
   @if (books.error()) { <p class="error" role="alert">{{ books.error() }} <button type="button" (click)="books.load()">Reintentar</button></p> }
   @if (!books.error()) {
-    <app-book-list [books]="books.filteredBooks()" [loading]="books.loading()" [loaded]="books.loaded()" (deleteRequested)="deleteBook($event)" />
+    <app-book-list [books]="books.filteredBooks()" [loading]="books.loading()" [loaded]="books.loaded()" (deleteRequested)="deleteBook($event)" (editRequested)="editBook($event)" (loanRequested)="loanBook($event)" />
   }
 </section>

@@ -1,6 +1,10 @@
 <main class="shell">
   <aside class="sidebar">
     <div class="brand"><span class="brand-mark">B</span><span>Biblioteca</span></div>
+    <nav class="sidebar-nav" aria-label="Navegación principal">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Catálogo</a>
+      <a routerLink="/loans" routerLinkActive="active">Préstamos</a>
+    </nav>
     <app-glass-button class="add-button" label="＋ Añadir libro" width="100%" (clicked)="dialog.open('book')" />
     <div class="sidebar-note"><span class="sidebar-icon" aria-hidden="true">✦</span><span>Organiza tu catálogo<br />de forma sencilla.</span></div>
     <div class="sidebar-actions">
@@ -8,7 +12,7 @@
       <app-glass-button class="side-action" label="＋ Añadir categoría" width="100%" (clicked)="dialog.open('genre')" />
     </div>
   </aside>
-  <router-outlet />
+  <div class="main"><router-outlet /></div>
 </main>
 <app-toast />
 @if (confirm.active(); as confirmation) {
@@ -21,8 +25,11 @@
     (confirmed)="confirm.accept()"
   />
 }
-@switch (dialog.active()) {
-  @case ('book') { <app-book-create-dialog /> }
-  @case ('author') { <app-author-create-dialog /> }
-  @case ('genre') { <app-genre-create-dialog /> }
+@if (dialog.active(); as state) {
+  @switch (state.kind) {
+    @case ('book') { <app-book-dialog [initialValue]="state.entity ?? null" /> }
+    @case ('author') { <app-author-dialog [initialValue]="state.entity ?? null" /> }
+    @case ('genre') { <app-genre-dialog [initialValue]="state.entity ?? null" /> }
+    @case ('loan') { <app-loan-dialog [initialValue]="state.entity ?? null" [bookId]="state.bookId ?? null" /> }
+  }
 }

@@ -1,0 +1,21 @@
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <label [for]="nameId()">{{ nameLabel() }}</label>
+  <input [id]="nameId()" type="text" formControlName="name" />
+  @if (form.controls.name.invalid && form.controls.name.touched) {
+    <small>{{ nameLabel() }} es obligatorio y debe tener entre 2 y 120 caracteres.</small>
+  }
+  <label [for]="extraId()">{{ extraLabel() }} (opcional)</label>
+  <textarea [id]="extraId()" formControlName="extra" rows="3"></textarea>
+  @if (extraRequired() && form.controls.extra.touched && !form.controls.extra.value.trim()) {
+    <small>{{ extraLabel() }} es obligatorio.</small>
+  }
+  @if (showBirthYear()) {
+    <label for="birth-year">Año de nacimiento (opcional)</label>
+    <input id="birth-year" type="number" formControlName="birthYear" />
+    @if (initialValue()?.birthYear !== undefined) {
+      <small>Una vez guardado, este dato no se puede dejar vacío.</small>
+    }
+  }
+  @if (errorMessage()) { <p class="error" role="alert">{{ errorMessage() }}</p> }
+  <button type="submit" [disabled]="saving()">{{ saving() ? 'Guardando...' : submitLabel() }}</button>
+</form>

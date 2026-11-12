@@ -9,3 +9,4 @@ h1 { margin: 0; font-size: 32px; }
 .book-count { margin-left: auto; color: #94a3b8; font-size: 13px; }
 .error { color: #fca5a5; }
 @media (max-width: 760px) { .content { width: auto; padding: 28px 18px; } .topbar { align-items: start; flex-wrap: wrap; } .search { order: 3; width: 100%; } .toolbar { align-items: stretch; flex-wrap: wrap; } .book-count { width: 100%; margin-left: 0; } }
+:host { display: block; }

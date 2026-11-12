@@ -1,0 +1,4 @@
+<app-modal (closed)="dialog.close()">
+  <h2>{{ initialValue() ? 'Editar autor' : 'Añadir autor' }}</h2>
+  <app-entity-form nameLabel="Nombre" extraLabel="Nacionalidad" nameId="author-name" extraId="author-nationality" [extraRequired]="true" [showBirthYear]="true" [initialValue]="initialValue() ? { name: initialValue()!.name, extra: initialValue()!.nationality, birthYear: initialValue()!.birthYear } : null" [saving]="saving()" [errorMessage]="error()" (submitted)="save($event)" />
+</app-modal>

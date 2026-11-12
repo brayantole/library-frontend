@@ -1,8 +1,9 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, input, output } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Author } from '../../features/authors/models/author';
 import { CreateBookDto } from '../../features/books/models/book';
 import { Genre } from '../../features/genres/models/genre';
+import { Book } from '../../features/books/models/book';
 
 interface BookFormControls {
   title: FormControl<string>;
@@ -16,6 +17,7 @@ interface BookFormControls {
   selector: 'app-book-form',
   imports: [ReactiveFormsModule],
   templateUrl: './book-form.html',
+  styleUrl: './book-form.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BookForm {
@@ -24,6 +26,7 @@ export class BookForm {
   readonly saving = input(false);
   readonly errorMessage = input('');
   readonly submitted = output<CreateBookDto>();
+  readonly initialValue = input<Book | null>(null);
 
   readonly form = new FormGroup<BookFormControls>({
     title: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
@@ -32,6 +35,19 @@ export class BookForm {
     genreIds: new FormControl<string[]>([], { nonNullable: true, validators: [Validators.required, Validators.minLength(1)] }),
     year: new FormControl<number | null>(null, [Validators.min(0), Validators.max(new Date().getFullYear())]),
   });
+
+  constructor() {
+    effect(() => {
+      const value = this.initialValue();
+      if (value) {
+        this.form.patchValue({ title: value.title, isbn: value.isbn, authorId: value.authorId, genreIds: value.genreIds, year: value.year ?? null });
+        if (value.year !== undefined) {
+          this.form.controls.year.addValidators(Validators.required);
+          this.form.controls.year.updateValueAndValidity();
+        }
+      }
+    });
+  }
 
   submit(): void {
     if (this.form.invalid) {

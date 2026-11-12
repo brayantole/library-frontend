@@ -1,0 +1,28 @@
+.book-list { display: grid; gap: var(--space-3); padding: 0; list-style: none; }
+.book-list li {
+  display: grid;
+  gap: var(--space-2);
+  padding: 18px;
+  color: var(--text-2);
+  background: linear-gradient(145deg, var(--surface-strong), var(--surface));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 20px rgba(0,0,0,.2);
+  backdrop-filter: blur(8px);
+  transition: box-shadow .25s;
+}
+.book-list li:hover { box-shadow: 0 12px 26px rgba(0,0,0,.3); }
+.book-list strong { color: var(--text); font-size: 17px; }
+.book-list span:not(.availability) { color: var(--text-muted); font-size: 13px; }
+.availability { display: inline-block; width: 9px; height: 9px; margin-right: 8px; background: var(--success); border-radius: 50%; }
+.availability.unavailable { background: var(--danger); }
+.availability-badge { width: fit-content; padding: 3px 8px; color: var(--success) !important; background: rgba(52,211,153,.12); border-radius: 999px; }
+.availability-badge.unavailable { color: var(--danger) !important; background: rgba(251,113,133,.12); }
+.genre-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.genre-chip { padding: 3px 8px; color: var(--accent) !important; background: rgba(103,232,249,.1); border-radius: 999px; }
+.loading { display: flex; align-items: center; gap: 9px; color: var(--text-2); }
+.empty-state { display: grid; justify-items: center; gap: 6px; padding: 58px 20px; color: var(--text-muted); text-align: center; }
+.empty-state > span { color: var(--accent); font-size: 38px; }
+.empty-state strong { color: var(--text-2); }
+.empty-state p { margin: 0; font-size: 13px; }
+.spinner { width: 16px; height: 16px; border: 2px solid rgba(165,180,252,.35); border-top-color: var(--focus); border-radius: 50%; animation: spin .8s linear infinite; }

@@ -1,0 +1,4 @@
+<app-modal (closed)="dialog.close()">
+  <h2>{{ initialValue() ? 'Editar libro' : 'Añadir libro' }}</h2>
+  <app-book-form [authors]="authors.items()" [genres]="genres.items()" [initialValue]="initialValue()" [saving]="saving()" [errorMessage]="error()" (submitted)="save($event)" />
+</app-modal>

@@ -1,0 +1,6 @@
+<div class="button-wrap" [style.--w]="width()" [style.--h]="height()" [style.--r]="radius()" [style.--tr]="highlight()">
+  <button type="button" [disabled]="disabled()" [attr.aria-label]="label()" [attr.aria-expanded]="ariaExpanded()" [attr.aria-haspopup]="hasPopup() ? 'dialog' : null" (click)="clicked.emit()">
+    <span>{{ label() }}</span>
+  </button>
+  <div class="button-shadow" aria-hidden="true"></div>
+</div>

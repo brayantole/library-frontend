@@ -1,0 +1,4 @@
+<app-modal (closed)="dialog.close()">
+  <h2>{{ initialValue() ? 'Editar préstamo' : 'Nuevo préstamo' }}</h2>
+  <app-loan-form [books]="books.items().filter(book => book.available || book._id === (initialValue()?.bookId ?? bookId()))" [initialValue]="initialValue()" [selectedBookId]="bookId()" [saving]="saving()" [errorMessage]="error()" (submitted)="save($event)" />
+</app-modal>

@@ -20,13 +20,13 @@
             @for (genre of book.genres; track genre._id) { <span class="genre-chip">{{ genre.name }}</span> }
           </span>
         }
-        <app-glass-button
-          label="Eliminar"
-          width="92px"
-          height="36px"
-          [disabled]="deletingId() === bookId(book)"
-          (clicked)="deleteRequested.emit(book)"
-        />
+        <div class="book-actions">
+          @if (book.available) {
+            <app-glass-button label="Prestar" width="92px" height="36px" (clicked)="loanRequested.emit(book)" />
+          }
+          <app-glass-button label="Editar" width="92px" height="36px" (clicked)="editRequested.emit(book)" />
+          <app-glass-button label="Eliminar" width="92px" height="36px" (clicked)="deleteRequested.emit(book)" />
+        </div>
       </li>
     }
   </ul>

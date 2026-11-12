@@ -1,0 +1,6 @@
+@if (toast.message()) {
+  <div class="toast" role="status">
+    <span aria-hidden="true">✓</span>{{ toast.message() }}
+    <button type="button" aria-label="Cerrar confirmación" (click)="toast.clear()">×</button>
+  </div>
+}

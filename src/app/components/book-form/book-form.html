@@ -1,4 +1,4 @@
-<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+<form class="form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
   <label for="title">Título</label>
   <input id="title" type="text" formControlName="title" />
   @if (isInvalid('title')) { <small>El título es obligatorio y debe tener al menos 2 caracteres.</small> }
@@ -26,7 +26,10 @@
 
   <label for="year">Año (opcional)</label>
   <input id="year" type="number" formControlName="year" />
+  @if (initialValue()?.year !== undefined) {
+    <small>Una vez guardado, este dato no se puede dejar vacío.</small>
+  }
 
   @if (errorMessage()) { <p class="error" role="alert">{{ errorMessage() }}</p> }
-  <button type="submit" [disabled]="saving()"> {{ saving() ? 'Guardando...' : 'Guardar libro' }} </button>
+  <button type="submit" [disabled]="saving()"> {{ saving() ? 'Guardando…' : (initialValue() ? 'Guardar cambios' : 'Añadir libro') }} </button>
 </form>

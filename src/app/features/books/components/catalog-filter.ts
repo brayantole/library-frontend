@@ -19,6 +19,8 @@ export class CatalogFilter {
   readonly opened = output<void>();
   readonly authorDelete = output<Author>();
   readonly genreDelete = output<Genre>();
+  readonly authorEdit = output<Author>();
+  readonly genreEdit = output<Genre>();
   readonly filter = inject(BooksStore);
   readonly pendingAuthorIds = signal<string[]>([]);
   readonly pendingGenreIds = signal<string[]>([]);
